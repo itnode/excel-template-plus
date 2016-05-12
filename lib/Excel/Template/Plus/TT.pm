@@ -56,6 +56,14 @@ has 'template_class' => (
     default => "Template",
 );
 
+has 'excel_template_config' => (
+
+    is => "rw",
+    isa => 'HashRef',
+    default => sub {{}},
+);
+
+
 ## private attributes
 
 has '_excel_template' => (
@@ -93,7 +101,7 @@ sub _prepare_excel_template {
     confess "Template failed to produce any output"
         unless length($buf);
 
-    my $excel_template = eval { Excel::Template->new(file => $fh) };
+    my $excel_template = eval { Excel::Template->new(%{ $self->excel_template_config }, file => $fh) };
     if ($@) {
         warn $buf;
         confess $@;
@@ -123,6 +131,7 @@ Excel::Template::Plus::TT - Extension of Excel::Template to use TT
       template => 'greeting.tmpl',
       config   => { INCLUDE  => [ '/templates' ] },
       params   => { greeting => 'Hello' }
+      excel_template_config => { RENDERER => Excel::Template->RENDER_NML }
   );
   
   $template->param(location => 'World');
